@@ -1,0 +1,53 @@
+{
+  "app": {
+    "signingConfigs": [
+      {
+        "name": "default",
+        "type": "HarmonyOS",
+        "material": {
+          "certpath": "C:\\Users\\Cheng guilin\\.ohos\\config\\default_ohos_vsCIARvO3Mz5i5MEJ5JEP-EKDnj8nwA8B1-OCfihu0Q=.cer",
+          "keyAlias": "debugKey",
+          "keyPassword": "0000001AACAD6DF46D67D87D2E9E9E1C681D9ED167385657FD0AB687DF5784C475F34C9BA3438CC35760",
+          "profile": "C:\\Users\\Cheng guilin\\.ohos\\config\\default_ohos_vsCIARvO3Mz5i5MEJ5JEP-EKDnj8nwA8B1-OCfihu0Q=.p7b",
+          "signAlg": "SHA256withECDSA",
+          "storeFile": "C:\\Users\\Cheng guilin\\.ohos\\config\\default_ohos_vsCIARvO3Mz5i5MEJ5JEP-EKDnj8nwA8B1-OCfihu0Q=.p12",
+          "storePassword": "0000001A5CC96F028BA2F0D70A738E5935A98E7DB2CB620B9951B7B8E9D4029FCF57EAB493226EB61F49"
+        }
+      }
+    ],
+    "products": [
+      {
+        "name": "default",
+        "signingConfig": "default",
+        "compatibleSdkVersion": "5.1.0(18)",
+        "runtimeOS": "HarmonyOS",
+        "targetSdkVersion": "6.0.0(20)"
+      }
+    ],
+    "buildModeSet": [
+      {
+        "name": "debug"
+      },
+      {
+        "name": "profile"
+      },
+      {
+        "name": "release"
+      }
+    ]
+  },
+  "modules": [
+    {
+      "name": "entry",
+      "srcPath": "./entry",
+      "targets": [
+        {
+          "name": "default",
+          "applyToProducts": [
+            "default"
+          ]
+        }
+      ]
+    }
+  ]
+}
