@@ -1,5 +1,7 @@
-import 'package:flutter/material.dart';
+import 'dart:convert';
 import 'package:flutter_harmonyos/models/pomodoro_record.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:flutter/foundation.dart';
 
 class PomodoroProvider extends ChangeNotifier {
   List<PomodoroRecord> _records = [];
@@ -7,7 +9,26 @@ class PomodoroProvider extends ChangeNotifier {
   List<PomodoroRecord> get records => _records;
 
   PomodoroProvider() {
-    _initMockData();
+    _loadFromHive();
+  }
+
+  void _loadFromHive() {
+    final box = Hive.box('pomodoro_records');
+    final data = box.get('data') as String?;
+    if (data != null) {
+      final list = jsonDecode(data) as List<dynamic>;
+      _records = list
+          .map((e) => PomodoroRecord.fromJson(e as Map<String, dynamic>))
+          .toList();
+    } else {
+      _initMockData();
+    }
+  }
+
+  void _saveToHive() {
+    final box = Hive.box('pomodoro_records');
+    final data = jsonEncode(_records.map((r) => r.toJson()).toList());
+    box.put('data', data);
   }
 
   void _initMockData() {
@@ -62,6 +83,7 @@ class PomodoroProvider extends ChangeNotifier {
 
   void addRecord(PomodoroRecord record) {
     _records.add(record);
+    _saveToHive();
     notifyListeners();
   }
 

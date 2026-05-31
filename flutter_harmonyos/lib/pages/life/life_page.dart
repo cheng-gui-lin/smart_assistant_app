@@ -1,4 +1,8 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
+import 'package:flutter_harmonyos/providers/life_provider.dart';
 import 'package:flutter_harmonyos/routes/app_routes.dart';
 
 class LifePage extends StatelessWidget {
@@ -33,140 +37,325 @@ class LifePage extends StatelessWidget {
             _AIChatTab(),
           ],
         ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () => Navigator.pushNamed(context, AppRoutes.postForm),
-          backgroundColor: const Color(0xFFF98C53),
-          foregroundColor: Colors.white,
-          elevation: 4,
-          child: const Icon(Icons.edit_rounded, size: 24),
-        ),
       ),
     );
   }
 }
 
+String _formatTime(DateTime dt) {
+  final now = DateTime.now();
+  final diff = now.difference(dt);
+  if (diff.inDays == 0) {
+    return '今天 ${DateFormat('HH:mm').format(dt)}';
+  } else if (diff.inDays == 1) {
+    return '昨天 ${DateFormat('HH:mm').format(dt)}';
+  }
+  return DateFormat('M月d日 HH:mm').format(dt);
+}
+
 class _FeedTab extends StatelessWidget {
   const _FeedTab();
 
-  final List<Map<String, dynamic>> _posts = const [
-    {
-      'mood': '😊',
-      'moodLabel': '开心',
-      'content': '今天图书馆学了6小时，感觉很充实！',
-      'time': '今天 16:30',
-      'aiComment': '太棒了！保持这个节奏，你一定可以达成目标的 💪',
-    },
-    {
-      'mood': '😰',
-      'moodLabel': '焦虑',
-      'content': '好焦虑，复习不完...感觉时间完全不够用',
-      'time': '昨天 22:15',
-      'aiComment': '别担心，按计划一步步来就好。先完成最重要的事情，你比想象中更强大 🌟',
-    },
-    {
-      'mood': '😢',
-      'moodLabel': '难过',
-      'content': '想家了...好想吃妈妈做的饭',
-      'time': '前天 10:15',
-      'aiComment': '抱抱你 🫂 想家的时候可以给家人打个视频电话，他们一定也很想你',
-    },
-  ];
+  void _confirmDelete(BuildContext context, String postId) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('删除动态'),
+        content: const Text('确定要删除这条动态吗？'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('取消'),
+          ),
+          TextButton(
+            onPressed: () {
+              context.read<LifeProvider>().deletePost(postId);
+              Navigator.pop(ctx);
+            },
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('确定'),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final posts = context.watch<LifeProvider>().posts;
 
-    if (_posts.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.inbox_rounded,
-                size: 64, color: theme.colorScheme.onSurfaceVariant),
-            const SizedBox(height: 16),
-            Text('还没有动态',
-                style: theme.textTheme.bodyLarge
-                    ?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
-            const SizedBox(height: 8),
-            Text('点击右下角按钮记录你的生活',
-                style: theme.textTheme.bodySmall
-                    ?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
-          ],
-        ),
-      );
-    }
-
-    return ListView.builder(
-      padding: const EdgeInsets.all(16),
-      itemCount: _posts.length,
-      itemBuilder: (context, index) {
-        final post = _posts[index];
-        return Card(
-          margin: const EdgeInsets.only(bottom: 16),
-          elevation: 2,
-          child: Padding(
-            padding: const EdgeInsets.all(20),
+    if (posts.isEmpty) {
+      return Stack(
+        children: [
+          Center(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Row(
-                  children: [
-                    Text(post['mood'] as String,
-                        style: const TextStyle(fontSize: 28)),
-                    const SizedBox(width: 12),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFFCCEB4),
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Text(
-                        post['moodLabel'] as String,
-                        style: const TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF333333)),
-                      ),
-                    ),
-                    const Spacer(),
-                    Text(
-                      post['time'] as String,
-                      style: theme.textTheme.bodySmall
-                          ?.copyWith(color: const Color(0xFF999999)),
-                    ),
-                  ],
-                ),
+                Icon(Icons.inbox_rounded,
+                    size: 64, color: theme.colorScheme.onSurfaceVariant),
                 const SizedBox(height: 16),
-                Text(post['content'] as String,
-                    style: theme.textTheme.bodyLarge?.copyWith(fontSize: 15)),
-                const SizedBox(height: 16),
-                Container(
-                  padding: const EdgeInsets.all(14),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFABD7FB),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text('🤖', style: TextStyle(fontSize: 20)),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Text(
-                          post['aiComment'] as String,
-                          style: theme.textTheme.bodyMedium
-                              ?.copyWith(fontSize: 13),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                Text('还没有动态',
+                    style: theme.textTheme.bodyLarge
+                        ?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
+                const SizedBox(height: 8),
+                Text('点击右下角按钮记录你的生活',
+                    style: theme.textTheme.bodySmall
+                        ?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
               ],
             ),
           ),
-        );
-      },
+          Positioned(
+            right: 16,
+            bottom: 16,
+            child: FloatingActionButton(
+              onPressed: () => Navigator.pushNamed(context, AppRoutes.postForm),
+              backgroundColor: const Color(0xFFF98C53),
+              foregroundColor: Colors.white,
+              elevation: 4,
+              child: const Icon(Icons.edit_rounded, size: 24),
+            ),
+          ),
+        ],
+      );
+    }
+
+    return Stack(
+      children: [
+        ListView.builder(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
+          itemCount: posts.length,
+          itemBuilder: (context, index) {
+            final post = posts[index];
+            return Card(
+              margin: const EdgeInsets.only(bottom: 16),
+              elevation: 2,
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Text(post.moodEmoji,
+                            style: const TextStyle(fontSize: 28)),
+                        const SizedBox(width: 12),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFFCCEB4),
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Text(
+                            post.moodLabel,
+                            style: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF333333)),
+                          ),
+                        ),
+                        const Spacer(),
+                        Text(
+                          _formatTime(post.createdAt),
+                          style: theme.textTheme.bodySmall
+                              ?.copyWith(color: const Color(0xFF999999)),
+                        ),
+                        const SizedBox(width: 4),
+                        GestureDetector(
+                          onTap: () => _confirmDelete(context, post.id),
+                          child: const Icon(Icons.close,
+                              size: 18, color: Color(0xFFE57373)),
+                        ),
+                      ],
+                    ),
+                    if (post.imageBase64 != null)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 12),
+                        child: GestureDetector(
+                          onTap: () {
+                            showDialog(
+                              context: context,
+                              builder: (_) => Stack(
+                                children: [
+                                  GestureDetector(
+                                    onTap: () => Navigator.pop(context),
+                                    child: Container(
+                                      color: Colors.black,
+                                      width: double.infinity,
+                                      height: double.infinity,
+                                    ),
+                                  ),
+                                  Center(
+                                    child: InteractiveViewer(
+                                      minScale: 0.5,
+                                      maxScale: 4,
+                                      child: Image.memory(
+                                        base64Decode(post.imageBase64!),
+                                        fit: BoxFit.contain,
+                                      ),
+                                    ),
+                                  ),
+                                  Positioned(
+                                    top: 48,
+                                    right: 16,
+                                    child: GestureDetector(
+                                      onTap: () => Navigator.pop(context),
+                                      child: Container(
+                                        width: 36,
+                                        height: 36,
+                                        decoration: BoxDecoration(
+                                          color: Colors.white.withAlpha(50),
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: const Icon(Icons.close,
+                                            color: Colors.white, size: 20),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: Image.memory(
+                              base64Decode(post.imageBase64!),
+                              width: double.infinity,
+                              height: 200,
+                              fit: BoxFit.cover,
+                              errorBuilder: (_, __, ___) => const Icon(
+                                  Icons.image,
+                                  size: 80,
+                                  color: Colors.grey),
+                            ),
+                          ),
+                        ),
+                      ),
+                    const SizedBox(height: 16),
+                    if (post.content.isNotEmpty)
+                      Text(post.content,
+                          style: theme.textTheme.bodyLarge
+                              ?.copyWith(fontSize: 15)),
+                    if (post.replies.isNotEmpty) ...[
+                      const SizedBox(height: 12),
+                      const Divider(),
+                      ...post.replies.map((reply) => Padding(
+                            padding: const EdgeInsets.only(top: 8),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(reply.role == 'ai' ? '🤖' : '👤',
+                                    style: const TextStyle(fontSize: 16)),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 12, vertical: 8),
+                                    decoration: BoxDecoration(
+                                      color: reply.role == 'ai'
+                                          ? const Color(0xFFE8F4FD)
+                                          : theme.colorScheme
+                                              .surfaceContainerHighest,
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: Text(
+                                      reply.content,
+                                      style: theme.textTheme.bodySmall,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )),
+                    ],
+                    const SizedBox(height: 8),
+                    _PostReplyInput(postId: post.id),
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
+        Positioned(
+          right: 16,
+          bottom: 16,
+          child: FloatingActionButton(
+            onPressed: () => Navigator.pushNamed(context, AppRoutes.postForm),
+            backgroundColor: const Color(0xFFF98C53),
+            foregroundColor: Colors.white,
+            elevation: 4,
+            child: const Icon(Icons.edit_rounded, size: 24),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _PostReplyInput extends StatefulWidget {
+  final String postId;
+
+  const _PostReplyInput({required this.postId});
+
+  @override
+  State<_PostReplyInput> createState() => _PostReplyInputState();
+}
+
+class _PostReplyInputState extends State<_PostReplyInput> {
+  final _controller = TextEditingController();
+
+  void _sendReply() {
+    final text = _controller.text.trim();
+    if (text.isEmpty) return;
+    context.read<LifeProvider>().replyToPost(widget.postId, text);
+    _controller.clear();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Row(
+      children: [
+        Expanded(
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.surfaceContainerHighest,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: TextField(
+              controller: _controller,
+              decoration: const InputDecoration(
+                hintText: '和AI聊聊这条动态...',
+                hintStyle: TextStyle(fontSize: 12),
+                border: InputBorder.none,
+                contentPadding: EdgeInsets.symmetric(vertical: 10),
+              ),
+              onSubmitted: (_) => _sendReply(),
+            ),
+          ),
+        ),
+        const SizedBox(width: 8),
+        GestureDetector(
+          onTap: _sendReply,
+          child: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: const BoxDecoration(
+              color: Color(0xFFABD7FB),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(Icons.send_rounded,
+                size: 16, color: Color(0xFF333333)),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -180,20 +369,11 @@ class _AIChatTab extends StatefulWidget {
 
 class _AIChatTabState extends State<_AIChatTab> {
   final TextEditingController _controller = TextEditingController();
-  final List<Map<String, String>> _messages = [
-    {'role': 'ai', 'content': '你好呀！我是你的AI陪伴助手，有什么想聊的吗？😊'},
-  ];
 
   void _sendMessage() {
     final text = _controller.text.trim();
     if (text.isEmpty) return;
-    setState(() {
-      _messages.add({'role': 'user', 'content': text});
-      _messages.add({
-        'role': 'ai',
-        'content': '收到你的消息了！我会认真倾听的。能再多说说你的想法吗？🤗',
-      });
-    });
+    context.read<LifeProvider>().sendToAI(text);
     _controller.clear();
   }
 
@@ -206,15 +386,17 @@ class _AIChatTabState extends State<_AIChatTab> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final messages = context.watch<LifeProvider>().chatSession.messages;
+
     return Column(
       children: [
         Expanded(
           child: ListView.builder(
             padding: const EdgeInsets.all(16),
-            itemCount: _messages.length,
+            itemCount: messages.length,
             itemBuilder: (context, index) {
-              final msg = _messages[index];
-              final isUser = msg['role'] == 'user';
+              final msg = messages[index];
+              final isUser = msg.role == 'user';
               return Padding(
                 padding: const EdgeInsets.only(bottom: 16),
                 child: Row(
@@ -265,7 +447,7 @@ class _AIChatTabState extends State<_AIChatTab> {
                           ],
                         ),
                         child: Text(
-                          msg['content']!,
+                          msg.content,
                           style: TextStyle(
                             fontSize: 14,
                             color: isUser
@@ -334,16 +516,18 @@ class _AIChatTabState extends State<_AIChatTab> {
                 ),
               ),
               const SizedBox(width: 12),
-              ElevatedButton(
+              TextButton(
                 onPressed: _sendMessage,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFF98C53),
+                style: TextButton.styleFrom(
                   foregroundColor: Colors.white,
-                  shape: const CircleBorder(),
-                  padding: const EdgeInsets.all(14),
-                  elevation: 2,
+                  backgroundColor: const Color(0xFFF98C53),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
                 ),
-                child: const Icon(Icons.send_rounded, size: 20),
+                child: const Text('发送', style: TextStyle(fontSize: 15)),
               ),
             ],
           ),

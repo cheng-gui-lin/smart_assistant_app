@@ -12,6 +12,22 @@ class SubGoal {
     this.isCompleted = false,
     DateTime? deadline,
   }) : deadline = deadline ?? DateTime.now().add(const Duration(days: 7));
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'goalId': goalId,
+        'title': title,
+        'isCompleted': isCompleted,
+        'deadline': deadline.toIso8601String(),
+      };
+
+  factory SubGoal.fromJson(Map<String, dynamic> json) => SubGoal(
+        id: json['id'] as String,
+        goalId: json['goalId'] as String,
+        title: json['title'] as String,
+        isCompleted: json['isCompleted'] as bool? ?? false,
+        deadline: DateTime.parse(json['deadline'] as String),
+      );
 }
 
 class Goal {
@@ -37,4 +53,31 @@ class Goal {
     List<SubGoal>? subGoals,
   })  : deadline = deadline ?? DateTime.now().add(const Duration(days: 30)),
         subGoals = subGoals ?? [];
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'title': title,
+        'description': description,
+        'progress': progress,
+        'remainingDays': remainingDays,
+        'deadline': deadline.toIso8601String(),
+        'iconName': iconName,
+        'status': status,
+        'subGoals': subGoals.map((s) => s.toJson()).toList(),
+      };
+
+  factory Goal.fromJson(Map<String, dynamic> json) => Goal(
+        id: json['id'] as String,
+        title: json['title'] as String,
+        description: json['description'] as String? ?? '',
+        progress: (json['progress'] as num?)?.toDouble() ?? 0.0,
+        remainingDays: json['remainingDays'] as int? ?? 30,
+        deadline: DateTime.parse(json['deadline'] as String),
+        iconName: json['iconName'] as String? ?? 'school',
+        status: json['status'] as String? ?? '进行中',
+        subGoals: (json['subGoals'] as List<dynamic>?)
+                ?.map((s) => SubGoal.fromJson(s as Map<String, dynamic>))
+                .toList() ??
+            [],
+      );
 }

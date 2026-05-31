@@ -1,5 +1,7 @@
-import 'package:flutter/material.dart';
+import 'dart:convert';
 import 'package:flutter_harmonyos/models/goal.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:flutter/foundation.dart';
 
 class GoalProvider extends ChangeNotifier {
   List<Goal> _goals = [];
@@ -7,7 +9,25 @@ class GoalProvider extends ChangeNotifier {
   List<Goal> get goals => _goals;
 
   GoalProvider() {
-    _initMockData();
+    _loadFromHive();
+  }
+
+  void _loadFromHive() {
+    final box = Hive.box('goals');
+    final data = box.get('data') as String?;
+    if (data != null) {
+      final list = jsonDecode(data) as List<dynamic>;
+      _goals =
+          list.map((e) => Goal.fromJson(e as Map<String, dynamic>)).toList();
+    } else {
+      _initMockData();
+    }
+  }
+
+  void _saveToHive() {
+    final box = Hive.box('goals');
+    final data = jsonEncode(_goals.map((g) => g.toJson()).toList());
+    box.put('data', data);
   }
 
   void _initMockData() {
@@ -102,6 +122,14 @@ class GoalProvider extends ChangeNotifier {
     ];
   }
 
+  Goal? getGoalById(String id) {
+    try {
+      return _goals.firstWhere((g) => g.id == id);
+    } catch (_) {
+      return null;
+    }
+  }
+
   void _recalculateProgress(String goalId) {
     final index = _goals.indexWhere((g) => g.id == goalId);
     if (index == -1) return;
@@ -115,6 +143,7 @@ class GoalProvider extends ChangeNotifier {
 
   void addGoal(Goal goal) {
     _goals.add(goal);
+    _saveToHive();
     notifyListeners();
   }
 
@@ -130,6 +159,7 @@ class GoalProvider extends ChangeNotifier {
             deadline.difference(DateTime.now()).inDays;
         if (_goals[index].remainingDays < 0) _goals[index].remainingDays = 0;
       }
+      _saveToHive();
       notifyListeners();
     }
   }
@@ -137,7 +167,9 @@ class GoalProvider extends ChangeNotifier {
   void toggleGoalStatus(String id) {
     final index = _goals.indexWhere((g) => g.id == id);
     if (index != -1) {
-      _goals[index].status = _goals[index].status == '进行中' ? '已完成' : '进行中';
+      _goals[index].status =
+          _goals[index].status == '进行中' ? '已完成' : '进行中';
+      _saveToHive();
       notifyListeners();
     }
   }
@@ -146,12 +178,14 @@ class GoalProvider extends ChangeNotifier {
     final index = _goals.indexWhere((g) => g.id == id);
     if (index != -1) {
       _goals[index].progress = progress;
+      _saveToHive();
       notifyListeners();
     }
   }
 
   void deleteGoal(String id) {
     _goals.removeWhere((g) => g.id == id);
+    _saveToHive();
     notifyListeners();
   }
 
@@ -160,6 +194,7 @@ class GoalProvider extends ChangeNotifier {
     if (index != -1) {
       _goals[index].subGoals.add(subGoal);
       _recalculateProgress(goalId);
+      _saveToHive();
       notifyListeners();
     }
   }
@@ -173,6 +208,7 @@ class GoalProvider extends ChangeNotifier {
         _goals[index].subGoals[sgIndex].isCompleted =
             !_goals[index].subGoals[sgIndex].isCompleted;
         _recalculateProgress(goalId);
+        _saveToHive();
         notifyListeners();
       }
     }
@@ -187,6 +223,7 @@ class GoalProvider extends ChangeNotifier {
       if (sgIndex != -1) {
         _goals[index].subGoals[sgIndex].title = title;
         _goals[index].subGoals[sgIndex].deadline = deadline;
+        _saveToHive();
         notifyListeners();
       }
     }
@@ -197,15 +234,8 @@ class GoalProvider extends ChangeNotifier {
     if (index != -1) {
       _goals[index].subGoals.removeWhere((s) => s.id == subGoalId);
       _recalculateProgress(goalId);
+      _saveToHive();
       notifyListeners();
-    }
-  }
-
-  Goal? getGoalById(String id) {
-    try {
-      return _goals.firstWhere((g) => g.id == id);
-    } catch (_) {
-      return null;
     }
   }
 }

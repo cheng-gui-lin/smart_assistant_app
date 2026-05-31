@@ -16,6 +16,7 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
   final _subGoalController = TextEditingController();
   DateTime? _subGoalDeadline;
   late DateTime _createdDate;
+  bool _showAddForm = false;
 
   @override
   void initState() {
@@ -46,7 +47,10 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
     );
     goalProvider.addSubGoal(widget.goalId, subGoal);
     _subGoalController.clear();
-    setState(() => _subGoalDeadline = null);
+    setState(() {
+      _subGoalDeadline = null;
+      _showAddForm = false;
+    });
   }
 
   void _showEditGoalDialog(Goal goal) {
@@ -467,96 +471,133 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                     ),
                   )),
             const SizedBox(height: 16),
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('添加短期目标', style: theme.textTheme.titleSmall),
-                    const SizedBox(height: 12),
-                    TextField(
-                      controller: _subGoalController,
-                      decoration: const InputDecoration(
-                        hintText: '输入子目标名称',
-                        border: OutlineInputBorder(),
-                        prefixIcon: Icon(Icons.flag_outlined),
+            if (_showAddForm)
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Text('添加短期目标', style: theme.textTheme.titleSmall),
+                          const Spacer(),
+                          GestureDetector(
+                            onTap: () => setState(() => _showAddForm = false),
+                            child: const Icon(Icons.close_rounded,
+                                size: 20, color: Color(0xFF999999)),
+                          ),
+                        ],
                       ),
-                    ),
-                    const SizedBox(height: 12),
-                    InkWell(
-                      onTap: () async {
-                        final date = await showDatePicker(
-                          context: context,
-                          initialDate: _subGoalDeadline ??
-                              DateTime.now().add(const Duration(days: 7)),
-                          firstDate: DateTime.now(),
-                          lastDate:
-                              DateTime.now().add(const Duration(days: 365 * 5)),
-                        );
-                        if (date != null) {
-                          setState(() => _subGoalDeadline = date);
-                        }
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 14),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: const Color(0xFFE0E0E0)),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Row(
-                          children: [
-                            const Icon(Icons.calendar_today_rounded,
-                                size: 18, color: Color(0xFF999999)),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                _subGoalDeadline != null
-                                    ? '截止: ${DateFormat('yyyy/MM/dd').format(_subGoalDeadline!)}'
-                                    : '选择截止日期',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: _subGoalDeadline != null
-                                      ? theme.colorScheme.onSurface
-                                      : theme.colorScheme.onSurfaceVariant,
-                                ),
-                              ),
-                            ),
-                            if (_subGoalDeadline != null)
-                              GestureDetector(
-                                onTap: () =>
-                                    setState(() => _subGoalDeadline = null),
-                                child: const Icon(Icons.close_rounded,
-                                    size: 18, color: Color(0xFF999999)),
-                              ),
-                          ],
+                      const SizedBox(height: 12),
+                      TextField(
+                        controller: _subGoalController,
+                        decoration: const InputDecoration(
+                          hintText: '输入子目标名称',
+                          border: OutlineInputBorder(),
+                          prefixIcon: Icon(Icons.flag_outlined),
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 12),
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: _addSubGoal,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFF98C53),
-                          foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
+                      const SizedBox(height: 12),
+                      InkWell(
+                        onTap: () async {
+                          final date = await showDatePicker(
+                            context: context,
+                            initialDate: _subGoalDeadline ??
+                                DateTime.now().add(const Duration(days: 7)),
+                            firstDate: DateTime.now(),
+                            lastDate: DateTime.now()
+                                .add(const Duration(days: 365 * 5)),
+                          );
+                          if (date != null) {
+                            setState(() => _subGoalDeadline = date);
+                          }
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 14),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: const Color(0xFFE0E0E0)),
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          elevation: 0,
+                          child: Row(
+                            children: [
+                              const Icon(Icons.calendar_today_rounded,
+                                  size: 18, color: Color(0xFF999999)),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  _subGoalDeadline != null
+                                      ? '截止: ${DateFormat('yyyy/MM/dd').format(_subGoalDeadline!)}'
+                                      : '选择截止日期',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: _subGoalDeadline != null
+                                        ? theme.colorScheme.onSurface
+                                        : theme.colorScheme.onSurfaceVariant,
+                                  ),
+                                ),
+                              ),
+                              if (_subGoalDeadline != null)
+                                GestureDetector(
+                                  onTap: () =>
+                                      setState(() => _subGoalDeadline = null),
+                                  child: const Icon(Icons.close_rounded,
+                                      size: 18, color: Color(0xFF999999)),
+                                ),
+                            ],
+                          ),
                         ),
-                        child: const Text('添加子目标',
-                            style: TextStyle(
-                                fontSize: 14, fontWeight: FontWeight.bold)),
                       ),
+                      const SizedBox(height: 12),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: _addSubGoal,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFFF98C53),
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            elevation: 0,
+                          ),
+                          child: const Text('添加子目标',
+                              style: TextStyle(
+                                  fontSize: 14, fontWeight: FontWeight.bold)),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              )
+            else
+              Card(
+                child: InkWell(
+                  onTap: () => setState(() => _showAddForm = true),
+                  borderRadius: BorderRadius.circular(24),
+                  child: const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 16),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.add_rounded,
+                            size: 20, color: Color(0xFFF98C53)),
+                        SizedBox(width: 8),
+                        Text(
+                          '添加短期目标',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFFF98C53),
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
               ),
-            ),
             const SizedBox(height: 32),
           ],
         ),

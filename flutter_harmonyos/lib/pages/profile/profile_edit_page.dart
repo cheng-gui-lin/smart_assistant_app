@@ -1,5 +1,8 @@
+import 'dart:convert';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:flutter_harmonyos/providers/user_provider.dart';
 
 class ProfileEditPage extends StatefulWidget {
@@ -13,6 +16,8 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
   late TextEditingController _nicknameController;
   late TextEditingController _accountController;
   late TextEditingController _bioController;
+  final ImagePicker _picker = ImagePicker();
+  Uint8List? _avatarBytes;
 
   @override
   void initState() {
@@ -21,6 +26,41 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
     _nicknameController = TextEditingController(text: profile.nickname);
     _accountController = TextEditingController(text: profile.account);
     _bioController = TextEditingController(text: profile.bio);
+    if (profile.avatarBase64 != null) {
+      _avatarBytes = base64Decode(profile.avatarBase64!);
+    }
+  }
+
+  Future<void> _pickAvatar() async {
+    final source = await showModalBottomSheet<ImageSource>(
+      context: context,
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.camera_alt),
+              title: const Text('拍照'),
+              onTap: () => Navigator.pop(context, ImageSource.camera),
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_library),
+              title: const Text('从相册选择'),
+              onTap: () => Navigator.pop(context, ImageSource.gallery),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (source == null) return;
+
+    final xFile = await _picker.pickImage(source: source);
+    if (xFile == null) return;
+
+    final bytes = await xFile.readAsBytes();
+    setState(() {
+      _avatarBytes = bytes;
+    });
   }
 
   @override
@@ -40,14 +80,15 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
       userProvider.updateAccount(_accountController.text.trim());
     }
     userProvider.updateBio(_bioController.text.trim());
+    if (_avatarBytes != null) {
+      userProvider.updateAvatar(base64Encode(_avatarBytes!));
+    }
     Navigator.pop(context);
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final userProvider = context.watch<UserProvider>();
-    final profile = userProvider.profile;
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -76,11 +117,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
           children: [
             const SizedBox(height: 24),
             GestureDetector(
-              onTap: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('头像编辑功能（需集成图片选择器）')),
-                );
-              },
+              onTap: _pickAvatar,
               child: Stack(
                 children: [
                   Container(
@@ -97,21 +134,18 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                         ),
                       ],
                     ),
-                    child: Center(
-                      child: profile.avatarBase64 != null
-                          ? ClipRRect(
-                              borderRadius: BorderRadius.circular(50),
-                              child: Container(
-                                width: 100,
-                                height: 100,
-                                color: const Color(0xFFFCCEB4),
-                                child: const Icon(Icons.person_rounded,
-                                    size: 48, color: Color(0xFFF98C53)),
-                              ),
-                            )
-                          : const Icon(Icons.person_rounded,
-                              size: 48, color: Color(0xFFF98C53)),
-                    ),
+                    child: _avatarBytes != null
+                        ? ClipRRect(
+                            borderRadius: BorderRadius.circular(50),
+                            child: Image.memory(
+                              _avatarBytes!,
+                              width: 100,
+                              height: 100,
+                              fit: BoxFit.cover,
+                            ),
+                          )
+                        : const Icon(Icons.person_rounded,
+                            size: 48, color: Color(0xFFF98C53)),
                   ),
                   Positioned(
                     bottom: 0,

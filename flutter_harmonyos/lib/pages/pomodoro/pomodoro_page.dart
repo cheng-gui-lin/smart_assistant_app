@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter_harmonyos/models/pomodoro_record.dart';
 import 'package:flutter_harmonyos/providers/pomodoro_provider.dart';
 import 'package:flutter_harmonyos/providers/todo_provider.dart';
+import 'package:flutter_harmonyos/services/notification_service.dart';
 
 class PomodoroPage extends StatefulWidget {
   final int? customMinutes;
@@ -65,6 +66,7 @@ class _PomodoroPageState extends State<PomodoroPage> {
   void _onComplete() {
     _stopTimer();
     _recordSession();
+    NotificationService().showPomodoroComplete(_totalSeconds ~/ 60);
     _showCompleteDialog();
     setState(() => _remainingSeconds = _totalSeconds);
   }

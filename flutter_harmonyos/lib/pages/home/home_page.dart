@@ -5,6 +5,7 @@ import 'package:flutter_harmonyos/routes/app_routes.dart';
 import 'package:flutter_harmonyos/providers/todo_provider.dart';
 import 'package:flutter_harmonyos/providers/goal_provider.dart';
 import 'package:flutter_harmonyos/providers/user_provider.dart';
+import 'package:flutter_harmonyos/services/notification_service.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -14,6 +15,20 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final todoProvider = context.read<TodoProvider>();
+      final todayTodos = todoProvider.getTodosForDate(DateTime.now());
+      final undone = todayTodos.where((t) => !t.done).length;
+      if (undone > 0) {
+        NotificationService().showTodoReminder(undone);
+      }
+    });
+  }
+
   void _showCustomTimerDialog() {
     final controller = TextEditingController();
     showDialog(
@@ -93,7 +108,7 @@ class _HomePageState extends State<HomePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 60),
+            const SizedBox(height: 16),
             Text(
               '$greeting，${userProvider.profile.nickname}',
               style: theme.textTheme.headlineSmall

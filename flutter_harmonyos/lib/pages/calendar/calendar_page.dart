@@ -22,6 +22,7 @@ class _CalendarPageState extends State<CalendarPage> {
   void initState() {
     super.initState();
     _currentMonth = DateTime(DateTime.now().year, DateTime.now().month);
+    _selectedDate = DateTime.now();
   }
 
   void _previousMonth() {

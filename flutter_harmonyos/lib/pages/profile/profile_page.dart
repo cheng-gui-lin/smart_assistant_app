@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_harmonyos/providers/theme_provider.dart';
@@ -54,9 +55,18 @@ class ProfilePage extends StatelessWidget {
                           ),
                         ],
                       ),
-                      child: const Center(
-                          child: Icon(Icons.person_rounded,
-                              size: 48, color: Color(0xFFF98C53))),
+                      child: profile.avatarBase64 != null
+                          ? ClipRRect(
+                              borderRadius: BorderRadius.circular(50),
+                              child: Image.memory(
+                                base64Decode(profile.avatarBase64!),
+                                width: 100,
+                                height: 100,
+                                fit: BoxFit.cover,
+                              ),
+                            )
+                          : const Icon(Icons.person_rounded,
+                              size: 48, color: Color(0xFFF98C53)),
                     ),
                     const SizedBox(height: 16),
                     Text(profile.nickname,
@@ -204,9 +214,8 @@ class ProfilePage extends StatelessWidget {
                     trailing: Icon(Icons.chevron_right_rounded,
                         color: theme.colorScheme.onSurfaceVariant),
                     onTap: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('通知设置（待开发）')),
-                      );
+                      Navigator.pushNamed(
+                          context, AppRoutes.notificationSettings);
                     },
                   ),
                   const Divider(height: 1, indent: 72, endIndent: 16),
@@ -271,101 +280,10 @@ class ProfilePage extends StatelessWidget {
                 ],
               ),
             ),
-            Card(
-              elevation: 2,
-              child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        const Icon(Icons.star_rounded,
-                            size: 20, color: Color(0xFFFFD54F)),
-                        const SizedBox(width: 8),
-                        Text('今日成就',
-                            style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: theme.colorScheme.onSurface)),
-                        const Spacer(),
-                        Text(
-                          todayTotal > 0
-                              ? '已完成 $todayCompleted/$todayTotal'
-                              : '暂无待办',
-                          style: theme.textTheme.bodySmall
-                              ?.copyWith(color: const Color(0xFF999999)),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        _buildAchievement(
-                          theme,
-                          '✅',
-                          '早起',
-                          todayCompleted > 0,
-                        ),
-                        _buildAchievement(
-                          theme,
-                          '📚',
-                          '学习',
-                          pomodoroProvider.todayRecords > 0,
-                        ),
-                        _buildAchievement(
-                          theme,
-                          '🔥',
-                          '连续${pomodoroProvider.totalRecords > 3 ? "7天" : "3天"}',
-                          pomodoroProvider.totalRecords > 3,
-                        ),
-                        _buildAchievement(
-                          theme,
-                          '💪',
-                          '运动',
-                          false,
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
             const SizedBox(height: 32),
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildAchievement(
-      ThemeData theme, String emoji, String label, bool achieved) {
-    return Column(
-      children: [
-        Container(
-          width: 50,
-          height: 50,
-          decoration: BoxDecoration(
-            color: achieved
-                ? const Color(0xFFD2E0AA)
-                : theme.colorScheme.surfaceContainerHighest,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Center(
-            child: Text(emoji, style: const TextStyle(fontSize: 20)),
-          ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 12,
-            color: achieved
-                ? theme.colorScheme.onSurface
-                : theme.colorScheme.onSurfaceVariant,
-          ),
-        ),
-      ],
     );
   }
 }

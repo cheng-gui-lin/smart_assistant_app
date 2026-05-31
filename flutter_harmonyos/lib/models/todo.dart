@@ -28,4 +28,21 @@ class Todo {
         'date': date.toIso8601String(),
         'time': time != null ? '${time!.hour}:${time!.minute}' : null,
       };
+
+  factory Todo.fromJson(Map<String, dynamic> json) {
+    TimeOfDay? time;
+    if (json['time'] != null) {
+      final parts = (json['time'] as String).split(':');
+      time = TimeOfDay(hour: int.parse(parts[0]), minute: int.parse(parts[1]));
+    }
+    return Todo(
+      id: json['id'] as String,
+      title: json['title'] as String,
+      description: json['description'] as String? ?? '',
+      priority: json['priority'] as int? ?? 2,
+      done: json['done'] as bool? ?? false,
+      date: DateTime.parse(json['date'] as String),
+      time: time,
+    );
+  }
 }

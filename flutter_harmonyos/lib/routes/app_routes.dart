@@ -8,4 +8,5 @@ class AppRoutes {
   static const String postDetail = '/postDetail';
   static const String profileEdit = '/profileEdit';
   static const String usageStats = '/usageStats';
+  static const String notificationSettings = '/notificationSettings';
 }

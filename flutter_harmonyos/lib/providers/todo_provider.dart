@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:flutter_harmonyos/models/todo.dart';
 
 class TodoProvider extends ChangeNotifier {
@@ -7,7 +9,24 @@ class TodoProvider extends ChangeNotifier {
   List<Todo> get todos => _todos;
 
   TodoProvider() {
-    _initMockData();
+    _loadFromHive();
+  }
+
+  void _loadFromHive() {
+    final box = Hive.box('todos');
+    final data = box.get('data') as String?;
+    if (data != null) {
+      final list = jsonDecode(data) as List<dynamic>;
+      _todos = list.map((e) => Todo.fromJson(e as Map<String, dynamic>)).toList();
+    } else {
+      _initMockData();
+    }
+  }
+
+  void _saveToHive() {
+    final box = Hive.box('todos');
+    final data = jsonEncode(_todos.map((t) => t.toJson()).toList());
+    box.put('data', data);
   }
 
   void _initMockData() {
@@ -43,17 +62,20 @@ class TodoProvider extends ChangeNotifier {
     final index = _todos.indexWhere((t) => t.id == id);
     if (index != -1) {
       _todos[index].done = !_todos[index].done;
+      _saveToHive();
       notifyListeners();
     }
   }
 
   void addTodo(Todo todo) {
     _todos.add(todo);
+    _saveToHive();
     notifyListeners();
   }
 
   void deleteTodo(String id) {
     _todos.removeWhere((t) => t.id == id);
+    _saveToHive();
     notifyListeners();
   }
 

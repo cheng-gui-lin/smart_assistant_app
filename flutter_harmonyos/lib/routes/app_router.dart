@@ -9,6 +9,7 @@ import 'package:flutter_harmonyos/pages/life/post_detail_page.dart';
 import 'package:flutter_harmonyos/pages/pomodoro/pomodoro_page.dart';
 import 'package:flutter_harmonyos/pages/profile/profile_edit_page.dart';
 import 'package:flutter_harmonyos/pages/profile/usage_stats_page.dart';
+import 'package:flutter_harmonyos/pages/profile/notification_settings_page.dart';
 
 class AppRouter {
   static Route<dynamic> generateRoute(RouteSettings settings) {
@@ -42,11 +43,10 @@ class AppRouter {
           builder: (_) => const PostFormPage(),
         );
       case AppRoutes.postDetail:
-        final args = settings.arguments as Map<String, dynamic>?;
+        final postId = settings.arguments as String?;
         return MaterialPageRoute(
           builder: (_) => PostDetailPage(
-            postId: args?['id'] as String? ?? '',
-            content: args?['content'] as String? ?? '',
+            postId: postId ?? '',
           ),
         );
       case AppRoutes.profileEdit:
@@ -56,6 +56,10 @@ class AppRouter {
       case AppRoutes.usageStats:
         return MaterialPageRoute(
           builder: (_) => const UsageStatsPage(),
+        );
+      case AppRoutes.notificationSettings:
+        return MaterialPageRoute(
+          builder: (_) => const NotificationSettingsPage(),
         );
       default:
         return MaterialPageRoute(

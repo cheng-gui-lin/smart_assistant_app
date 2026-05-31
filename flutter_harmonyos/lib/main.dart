@@ -1,6 +1,9 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:path_provider/path_provider.dart' as pp;
 import 'package:flutter_harmonyos/routes/app_router.dart';
 import 'package:flutter_harmonyos/pages/main_shell.dart';
 import 'package:flutter_harmonyos/providers/theme_provider.dart';
@@ -8,10 +11,31 @@ import 'package:flutter_harmonyos/providers/todo_provider.dart';
 import 'package:flutter_harmonyos/providers/goal_provider.dart';
 import 'package:flutter_harmonyos/providers/user_provider.dart';
 import 'package:flutter_harmonyos/providers/pomodoro_provider.dart';
+import 'package:flutter_harmonyos/providers/life_provider.dart';
+import 'package:flutter_harmonyos/services/notification_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  if (!kIsWeb) {
+    final appDir = await pp.getApplicationDocumentsDirectory();
+    await Hive.initFlutter(appDir.path);
+  }
+
+  await Hive.openBox('todos');
+  await Hive.openBox('goals');
+  await Hive.openBox('user_profile');
+  await Hive.openBox('pomodoro_records');
+  await Hive.openBox('posts');
+  await Hive.openBox('chat_sessions');
+
+  if (!kIsWeb) {
+    final notificationService = NotificationService();
+    await notificationService.init();
+  }
+
   await initializeDateFormatting('zh_CN');
+
   runApp(
     MultiProvider(
       providers: [
@@ -20,6 +44,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => GoalProvider()),
         ChangeNotifierProvider(create: (_) => UserProvider()),
         ChangeNotifierProvider(create: (_) => PomodoroProvider()),
+        ChangeNotifierProvider(create: (_) => LifeProvider()),
       ],
       child: const MyApp(),
     ),
