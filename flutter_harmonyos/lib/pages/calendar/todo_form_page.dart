@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:flutter_harmonyos/models/todo.dart';
+import 'package:flutter_harmonyos/providers/todo_provider.dart';
 
 class TodoFormPage extends StatefulWidget {
   final DateTime? initialDate;
@@ -28,6 +31,27 @@ class _TodoFormPageState extends State<TodoFormPage> {
     super.dispose();
   }
 
+  void _save() {
+    final title = _titleController.text.trim();
+    if (title.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('请输入待办标题')),
+      );
+      return;
+    }
+    final date = _selectedDate ?? DateTime.now();
+    final todo = Todo(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      title: title,
+      description: _descController.text.trim(),
+      priority: _priority,
+      date: date,
+      time: _selectedTime,
+    );
+    context.read<TodoProvider>().addTodo(todo);
+    Navigator.pop(context);
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -35,7 +59,7 @@ class _TodoFormPageState extends State<TodoFormPage> {
       appBar: AppBar(
         title: const Text('新增待办'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('保存')),
+          TextButton(onPressed: _save, child: const Text('保存')),
         ],
       ),
       body: SingleChildScrollView(
@@ -66,9 +90,18 @@ class _TodoFormPageState extends State<TodoFormPage> {
             const SizedBox(height: 8),
             SegmentedButton<int>(
               segments: const [
-                ButtonSegment(value: 3, label: Text('高'), icon: Icon(Icons.flag, size: 16)),
-                ButtonSegment(value: 2, label: Text('中'), icon: Icon(Icons.flag, size: 16)),
-                ButtonSegment(value: 1, label: Text('低'), icon: Icon(Icons.flag, size: 16)),
+                ButtonSegment(
+                    value: 3,
+                    label: Text('高'),
+                    icon: Icon(Icons.remove, size: 14, color: Colors.white)),
+                ButtonSegment(
+                    value: 2,
+                    label: Text('中'),
+                    icon: Icon(Icons.remove, size: 14, color: Colors.white)),
+                ButtonSegment(
+                    value: 1,
+                    label: Text('低'),
+                    icon: Icon(Icons.remove, size: 14, color: Colors.white)),
               ],
               selected: {_priority},
               onSelectionChanged: (v) => setState(() => _priority = v.first),
@@ -100,6 +133,7 @@ class _TodoFormPageState extends State<TodoFormPage> {
                 final time = await showTimePicker(
                   context: context,
                   initialTime: TimeOfDay.now(),
+                  initialEntryMode: TimePickerEntryMode.dial,
                 );
                 if (time != null) setState(() => _selectedTime = time);
               },

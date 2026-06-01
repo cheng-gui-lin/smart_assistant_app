@@ -478,12 +478,12 @@ class _AIChatTabState extends State<_AIChatTab> {
           ),
         ),
         Container(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
             color: theme.colorScheme.surface,
             borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(24),
-              topRight: Radius.circular(24),
+              topLeft: Radius.circular(20),
+              topRight: Radius.circular(20),
             ),
             boxShadow: [
               BoxShadow(
@@ -497,10 +497,10 @@ class _AIChatTabState extends State<_AIChatTab> {
             children: [
               Expanded(
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
                   decoration: BoxDecoration(
                     color: theme.colorScheme.surfaceContainerHighest,
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(16),
                   ),
                   child: TextField(
                     controller: _controller,
@@ -509,25 +509,25 @@ class _AIChatTabState extends State<_AIChatTab> {
                       hintStyle:
                           TextStyle(color: theme.colorScheme.onSurfaceVariant),
                       border: InputBorder.none,
-                      contentPadding: const EdgeInsets.symmetric(vertical: 14),
+                      contentPadding: const EdgeInsets.symmetric(vertical: 10),
                     ),
                     onSubmitted: (_) => _sendMessage(),
                   ),
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 8),
               TextButton(
                 onPressed: _sendMessage,
                 style: TextButton.styleFrom(
                   foregroundColor: Colors.white,
                   backgroundColor: const Color(0xFFF98C53),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(10),
                   ),
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                 ),
-                child: const Text('发送', style: TextStyle(fontSize: 15)),
+                child: const Text('发送', style: TextStyle(fontSize: 13)),
               ),
             ],
           ),

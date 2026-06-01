@@ -80,11 +80,20 @@ class TodoProvider extends ChangeNotifier {
   }
 
   List<Todo> getTodosForDate(DateTime date) {
-    return _todos.where((t) {
+    final result = _todos.where((t) {
       return t.date.year == date.year &&
           t.date.month == date.month &&
           t.date.day == date.day;
     }).toList();
+    result.sort((a, b) {
+      if (a.priority != b.priority) return b.priority.compareTo(a.priority);
+      final aMinutes =
+          a.time != null ? a.time!.hour * 60 + a.time!.minute : 1440;
+      final bMinutes =
+          b.time != null ? b.time!.hour * 60 + b.time!.minute : 1440;
+      return aMinutes.compareTo(bMinutes);
+    });
+    return result;
   }
 
   int get completedCount =>

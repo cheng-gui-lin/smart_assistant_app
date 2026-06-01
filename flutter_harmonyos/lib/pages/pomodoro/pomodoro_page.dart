@@ -274,16 +274,16 @@ class _PomodoroPageState extends State<PomodoroPage> {
                         ],
                       ),
                     ),
-                    const SizedBox(height: 32),
+                    const SizedBox(height: 24),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         IconButton(
                           onPressed: _resetTimer,
-                          icon: const Icon(Icons.refresh_rounded, size: 24),
+                          icon: const Icon(Icons.refresh_rounded, size: 20),
                           color: theme.colorScheme.onSurfaceVariant,
                         ),
-                        const SizedBox(width: 24),
+                        const SizedBox(width: 12),
                         ElevatedButton(
                           onPressed: _isRunning ? _stopTimer : _startTimer,
                           style: ElevatedButton.styleFrom(
@@ -293,30 +293,32 @@ class _PomodoroPageState extends State<PomodoroPage> {
                               borderRadius: BorderRadius.circular(20),
                             ),
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 40, vertical: 16),
+                                horizontal: 24, vertical: 10),
                             elevation: 2,
                           ),
                           child: Row(
+                            mainAxisSize: MainAxisSize.min,
                             children: [
                               Icon(
                                   _isRunning
                                       ? Icons.pause_rounded
                                       : Icons.play_arrow_rounded,
-                                  size: 24),
-                              const SizedBox(width: 8),
+                                  size: 18,
+                                  color: Colors.white),
+                              const SizedBox(width: 6),
                               Text(_isRunning ? '暂停' : '开始',
                                   style: const TextStyle(
-                                      fontSize: 16,
+                                      fontSize: 14,
                                       fontWeight: FontWeight.bold)),
                             ],
                           ),
                         ),
-                        const SizedBox(width: 24),
+                        const SizedBox(width: 12),
                         IconButton(
                           onPressed: _remainingSeconds < _totalSeconds
                               ? _endTimer
                               : null,
-                          icon: const Icon(Icons.stop_rounded, size: 24),
+                          icon: const Icon(Icons.stop_rounded, size: 20),
                           color: const Color(0xFFE57373),
                           disabledColor: theme.colorScheme.onSurfaceVariant
                               .withValues(alpha: 0.3),

@@ -363,13 +363,13 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                             style: theme.textTheme.bodyMedium,
                           ),
                         ),
-                        const Spacer(),
-                        Text(
-                          '创建于 ${DateFormat('yyyy/MM/dd').format(_createdDate)}',
-                          style: theme.textTheme.bodySmall
-                              ?.copyWith(color: Colors.grey),
-                        ),
                       ],
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '创建于 ${DateFormat('yyyy/MM/dd').format(_createdDate)}',
+                      style: theme.textTheme.bodySmall
+                          ?.copyWith(color: Colors.grey),
                     ),
                   ],
                 ),

@@ -17,8 +17,7 @@ class UsageStatsPage extends StatelessWidget {
     final todayCompleted = todoProvider.completedCount;
     final todayTotal = todoProvider.todayCount;
     final pending = todayTotal - todayCompleted;
-    final completionRate =
-        todayTotal > 0 ? todayCompleted / todayTotal : 0.0;
+    final completionRate = todayTotal > 0 ? todayCompleted / todayTotal : 0.0;
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -43,8 +42,7 @@ class UsageStatsPage extends StatelessWidget {
                         const Icon(Icons.timer_rounded,
                             size: 20, color: Color(0xFFF98C53)),
                         const SizedBox(width: 8),
-                        Text('🍅 专注统计',
-                            style: theme.textTheme.titleMedium),
+                        Text('🍅 专注统计', style: theme.textTheme.titleMedium),
                       ],
                     ),
                     const SizedBox(height: 20),
@@ -94,8 +92,7 @@ class UsageStatsPage extends StatelessWidget {
                         const Icon(Icons.today_rounded,
                             size: 20, color: Color(0xFFF98C53)),
                         const SizedBox(width: 8),
-                        Text('今日数据',
-                            style: theme.textTheme.titleMedium),
+                        Text('今日数据', style: theme.textTheme.titleMedium),
                       ],
                     ),
                     const SizedBox(height: 24),
@@ -185,8 +182,8 @@ class UsageStatsPage extends StatelessWidget {
                         Text(
                           '今日专注 ${pomodoroProvider.todayMinutes} 分钟 · '
                           '${pomodoroProvider.todayRecords} 次',
-                          style: theme.textTheme.bodySmall?.copyWith(
-                              color: const Color(0xFF999999)),
+                          style: theme.textTheme.bodySmall
+                              ?.copyWith(color: const Color(0xFF999999)),
                         ),
                       ],
                     ),
@@ -207,53 +204,48 @@ class UsageStatsPage extends StatelessWidget {
                         const Icon(Icons.bar_chart_rounded,
                             size: 20, color: Color(0xFFF98C53)),
                         const SizedBox(width: 8),
-                        Text('近7天专注趋势',
-                            style: theme.textTheme.titleMedium),
+                        Text('近7天专注趋势', style: theme.textTheme.titleMedium),
                       ],
                     ),
                     const SizedBox(height: 20),
                     SizedBox(
-                      height: 160,
+                      height: 120,
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: dailyMinutes.entries.map((entry) {
                           final maxMinutes = dailyMinutes.values
                               .reduce((a, b) => a > b ? a : b);
-                          final heightRatio = maxMinutes > 0
-                              ? entry.value / maxMinutes
-                              : 0.0;
+                          final heightRatio =
+                              maxMinutes > 0 ? entry.value / maxMinutes : 0.0;
                           return Expanded(
                             child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 4),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 2),
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
                                   Text(
                                     '${entry.value}',
-                                    style: theme.textTheme.bodySmall
-                                        ?.copyWith(
-                                            fontSize: 10,
-                                            color: const Color(0xFFF98C53)),
+                                    style: theme.textTheme.bodySmall?.copyWith(
+                                        fontSize: 9,
+                                        color: const Color(0xFFF98C53)),
                                   ),
-                                  const SizedBox(height: 4),
+                                  const SizedBox(height: 2),
                                   Container(
-                                    height: 100 * heightRatio,
+                                    height: 80 * heightRatio,
                                     decoration: BoxDecoration(
-                                      color: const Color(0xFFF98C53)
-                                          .withValues(alpha: 0.6 +
-                                              0.4 * heightRatio),
-                                      borderRadius:
-                                          const BorderRadius.vertical(
+                                      color: const Color(0xFFF98C53).withValues(
+                                          alpha: 0.6 + 0.4 * heightRatio),
+                                      borderRadius: const BorderRadius.vertical(
                                         top: Radius.circular(6),
                                       ),
                                     ),
                                   ),
-                                  const SizedBox(height: 4),
+                                  const SizedBox(height: 2),
                                   Text(
                                     entry.key,
                                     style: theme.textTheme.bodySmall
-                                        ?.copyWith(fontSize: 10),
+                                        ?.copyWith(fontSize: 9),
                                   ),
                                 ],
                               ),
@@ -292,24 +284,25 @@ class UsageStatsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildStatItem(ThemeData theme, String value, String label,
-      IconData icon, Color color) {
+  Widget _buildStatItem(
+      ThemeData theme, String value, String label, IconData icon, Color color) {
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, size: 24, color: color),
-        const SizedBox(height: 8),
+        Icon(icon, size: 20, color: color),
+        const SizedBox(height: 6),
         Text(
           value,
           style: TextStyle(
-            fontSize: 22,
+            fontSize: 18,
             fontWeight: FontWeight.bold,
             color: color,
           ),
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: 2),
         Text(
           label,
-          style: theme.textTheme.bodySmall,
+          style: theme.textTheme.bodySmall?.copyWith(fontSize: 11),
         ),
       ],
     );

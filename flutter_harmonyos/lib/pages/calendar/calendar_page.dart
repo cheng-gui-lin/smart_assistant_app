@@ -73,155 +73,158 @@ class _CalendarPageState extends State<CalendarPage> {
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                IconButton(
-                  onPressed: _previousMonth,
-                  icon: const Icon(Icons.chevron_left_rounded, size: 28),
-                  color: theme.colorScheme.onSurface,
-                ),
-                Text(monthStr,
-                    style: theme.textTheme.titleLarge
-                        ?.copyWith(fontWeight: FontWeight.bold)),
-                IconButton(
-                  onPressed: _nextMonth,
-                  icon: const Icon(Icons.chevron_right_rounded, size: 28),
-                  color: theme.colorScheme.onSurface,
-                ),
-              ],
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  IconButton(
+                    onPressed: _previousMonth,
+                    icon: const Icon(Icons.chevron_left_rounded, size: 28),
+                    color: theme.colorScheme.onSurface,
+                  ),
+                  Text(monthStr,
+                      style: theme.textTheme.titleLarge
+                          ?.copyWith(fontWeight: FontWeight.bold)),
+                  IconButton(
+                    onPressed: _nextMonth,
+                    icon: const Icon(Icons.chevron_right_rounded, size: 28),
+                    color: theme.colorScheme.onSurface,
+                  ),
+                ],
+              ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: _weekDays
-                  .map((d) => SizedBox(
-                        width: 40,
-                        child: Text(
-                          d,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                              color: theme.colorScheme.onSurfaceVariant),
-                        ),
-                      ))
-                  .toList(),
-            ),
-          ),
-          const SizedBox(height: 8),
-          Card(
-            margin: const EdgeInsets.symmetric(horizontal: 16),
-            elevation: 2,
-            child: Padding(
-              padding: const EdgeInsets.all(8),
-              child: GridView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 7,
-                  childAspectRatio: 1,
-                ),
-                itemCount: firstWeekday + daysInMonth,
-                itemBuilder: (context, index) {
-                  if (index < firstWeekday) {
-                    return const SizedBox();
-                  }
-                  final day = index - firstWeekday + 1;
-                  final date =
-                      DateTime(_currentMonth.year, _currentMonth.month, day);
-                  final isToday = _isSameDay(date, DateTime.now());
-                  final isSelected =
-                      _selectedDate != null && _isSameDay(date, _selectedDate!);
-                  final hasTodos =
-                      todoProvider.getTodosForDate(date).isNotEmpty;
-
-                  return GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _selectedDate =
-                            _isSameDay(date, _selectedDate ?? DateTime(0))
-                                ? null
-                                : date;
-                      });
-                    },
-                    child: Container(
-                      margin: const EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                        color: isSelected
-                            ? const Color(0xFFF98C53)
-                            : (isToday
-                                ? const Color(0xFFFCCEB4)
-                                : Colors.transparent),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            '$day',
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: _weekDays
+                    .map((d) => SizedBox(
+                          width: 40,
+                          child: Text(
+                            d,
+                            textAlign: TextAlign.center,
                             style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: isToday || isSelected
-                                  ? FontWeight.bold
-                                  : FontWeight.normal,
-                              color: isSelected
-                                  ? Colors.white
-                                  : theme.colorScheme.onSurface,
-                            ),
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                color: theme.colorScheme.onSurfaceVariant),
                           ),
-                          if (hasTodos)
-                            Container(
-                              width: 6,
-                              height: 6,
-                              margin: const EdgeInsets.only(top: 4),
-                              decoration: BoxDecoration(
+                        ))
+                    .toList(),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Card(
+              margin: const EdgeInsets.symmetric(horizontal: 16),
+              elevation: 2,
+              child: Padding(
+                padding: const EdgeInsets.all(8),
+                child: GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 7,
+                    childAspectRatio: 1,
+                  ),
+                  itemCount: firstWeekday + daysInMonth,
+                  itemBuilder: (context, index) {
+                    if (index < firstWeekday) {
+                      return const SizedBox();
+                    }
+                    final day = index - firstWeekday + 1;
+                    final date =
+                        DateTime(_currentMonth.year, _currentMonth.month, day);
+                    final isToday = _isSameDay(date, DateTime.now());
+                    final isSelected = _selectedDate != null &&
+                        _isSameDay(date, _selectedDate!);
+                    final hasTodos =
+                        todoProvider.getTodosForDate(date).isNotEmpty;
+
+                    return GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _selectedDate =
+                              _isSameDay(date, _selectedDate ?? DateTime(0))
+                                  ? null
+                                  : date;
+                        });
+                      },
+                      child: Container(
+                        margin: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                          color: isSelected
+                              ? const Color(0xFFF98C53)
+                              : (isToday
+                                  ? const Color(0xFFFCCEB4)
+                                  : Colors.transparent),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              '$day',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: isToday || isSelected
+                                    ? FontWeight.bold
+                                    : FontWeight.normal,
                                 color: isSelected
                                     ? Colors.white
-                                    : const Color(0xFFD2E0AA),
-                                shape: BoxShape.circle,
+                                    : theme.colorScheme.onSurface,
                               ),
                             ),
-                        ],
+                            if (hasTodos)
+                              Container(
+                                width: 6,
+                                height: 6,
+                                margin: const EdgeInsets.only(top: 4),
+                                decoration: BoxDecoration(
+                                  color: isSelected
+                                      ? Colors.white
+                                      : const Color(0xFFD2E0AA),
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                          ],
+                        ),
                       ),
-                    ),
-                  );
-                },
-              ),
-            ),
-          ),
-          if (_selectedDate != null) ...[
-            const SizedBox(height: 16),
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: _buildDayDetail(theme, todoProvider, pomodoroProvider),
-              ),
-            ),
-          ] else ...[
-            Expanded(
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.calendar_today_rounded,
-                        size: 48, color: theme.colorScheme.onSurfaceVariant),
-                    const SizedBox(height: 16),
-                    Text('选择一个日期查看待办',
-                        style: TextStyle(
-                            color: theme.colorScheme.onSurfaceVariant)),
-                  ],
+                    );
+                  },
                 ),
               ),
             ),
+            if (_selectedDate != null) ...[
+              const SizedBox(height: 16),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: _buildDayDetail(
+                    theme, todoProvider, pomodoroProvider),
+              ),
+            ] else ...[
+              SizedBox(
+                height: 200,
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.calendar_today_rounded,
+                          size: 48, color: theme.colorScheme.onSurfaceVariant),
+                      const SizedBox(height: 16),
+                      Text('选择一个日期查看待办',
+                          style: TextStyle(
+                              color: theme.colorScheme.onSurfaceVariant)),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+            const SizedBox(height: 16),
           ],
-        ],
+        ),
       ),
     );
   }
@@ -245,7 +248,12 @@ class _CalendarPageState extends State<CalendarPage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('📋 $dateStr', style: theme.textTheme.titleMedium),
+                Flexible(
+                  child: Text('📋 $dateStr',
+                      style: theme.textTheme.titleMedium,
+                      overflow: TextOverflow.ellipsis),
+                ),
+                const SizedBox(width: 8),
                 ElevatedButton(
                   onPressed: () => Navigator.pushNamed(
                       context, AppRoutes.todoForm,
@@ -257,10 +265,11 @@ class _CalendarPageState extends State<CalendarPage> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     padding:
-                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     elevation: 0,
                   ),
                   child: const Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(Icons.add_rounded, size: 16),
                       SizedBox(width: 4),
@@ -300,17 +309,19 @@ class _CalendarPageState extends State<CalendarPage> {
                       },
                       child: Row(
                         children: [
-                          Container(
-                            width: 20,
-                            height: 20,
-                            decoration: BoxDecoration(
-                              color: _priorityColor(todo.priority),
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: _priorityColor(todo.priority)
-                                    .withAlpha(180),
-                                width: 3,
+                          GestureDetector(
+                            onTap: () {
+                              todoProvider.deleteTodo(todo.id);
+                            },
+                            child: Container(
+                              width: 20,
+                              height: 20,
+                              decoration: BoxDecoration(
+                                color: _priorityColor(todo.priority),
+                                shape: BoxShape.circle,
                               ),
+                              child: const Icon(Icons.remove,
+                                  size: 14, color: Colors.white),
                             ),
                           ),
                           const SizedBox(width: 12),
