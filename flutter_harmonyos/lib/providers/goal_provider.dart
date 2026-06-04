@@ -137,6 +137,7 @@ class GoalProvider extends ChangeNotifier {
     if (goal.subGoals.isEmpty) return;
     final completed = goal.subGoals.where((s) => s.isCompleted).length;
     goal.progress = completed / goal.subGoals.length;
+    goal.status = goal.progress >= 1.0 ? '已完成' : '进行中';
     goal.remainingDays = goal.deadline.difference(DateTime.now()).inDays;
     if (goal.remainingDays < 0) goal.remainingDays = 0;
   }

@@ -271,7 +271,7 @@ class _CalendarPageState extends State<CalendarPage> {
                   child: const Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(Icons.add_rounded, size: 16),
+                      Icon(Icons.add_rounded, size: 16, color: Colors.white),
                       SizedBox(width: 4),
                       Text('新增待办', style: TextStyle(fontSize: 12)),
                     ],
