@@ -306,25 +306,21 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                             ],
                           ),
                         ),
-                        GestureDetector(
-                          onTap: () =>
-                              goalProvider.toggleGoalStatus(widget.goalId),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 12, vertical: 6),
-                            decoration: BoxDecoration(
-                              color: goal.status == '已完成'
-                                  ? const Color(0xFF81C784)
-                                  : const Color(0xFFF98C53),
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Text(
-                              goal.status,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                              ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: goal.status == '已完成'
+                                ? const Color(0xFF81C784)
+                                : const Color(0xFFF98C53),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Text(
+                            goal.status,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
                         ),

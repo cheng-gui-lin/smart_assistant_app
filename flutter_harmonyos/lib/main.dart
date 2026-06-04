@@ -59,7 +59,7 @@ class MyApp extends StatelessWidget {
     final themeProvider = context.watch<ThemeProvider>();
 
     return MaterialApp(
-      title: '智能日常助手',
+      title: '随记',
       debugShowCheckedModeBanner: false,
       themeMode: themeProvider.themeMode,
       theme: _buildLightTheme(),

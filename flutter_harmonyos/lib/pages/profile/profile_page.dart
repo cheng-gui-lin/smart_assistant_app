@@ -271,9 +271,9 @@ class ProfilePage extends StatelessWidget {
                     onTap: () {
                       showAboutDialog(
                         context: context,
-                        applicationName: '智能日常助手',
+                        applicationName: '随记',
                         applicationVersion: '1.0.0',
-                        applicationLegalese: '移动开发技术课程 期末项目',
+                        applicationLegalese: '智能日常助手APP',
                       );
                     },
                   ),

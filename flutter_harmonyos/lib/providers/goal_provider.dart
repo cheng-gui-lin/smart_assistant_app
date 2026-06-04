@@ -165,20 +165,11 @@ class GoalProvider extends ChangeNotifier {
     }
   }
 
-  void toggleGoalStatus(String id) {
-    final index = _goals.indexWhere((g) => g.id == id);
-    if (index != -1) {
-      _goals[index].status =
-          _goals[index].status == '进行中' ? '已完成' : '进行中';
-      _saveToHive();
-      notifyListeners();
-    }
-  }
-
   void updateGoalProgress(String id, double progress) {
     final index = _goals.indexWhere((g) => g.id == id);
     if (index != -1) {
       _goals[index].progress = progress;
+      _goals[index].status = progress >= 1.0 ? '已完成' : '进行中';
       _saveToHive();
       notifyListeners();
     }
