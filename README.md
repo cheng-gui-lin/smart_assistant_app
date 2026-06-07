@@ -1,4 +1,4 @@
-# 智能日常助手（随记）
+# 随记
 
 > 面向大学生的个人成长管家 + AI 情感陪伴助手。  
 > 解决目标规划混乱、任务拖延、时间利用率低、情绪内耗等问题。  
@@ -12,7 +12,7 @@
 
 ## 项目介绍
 
-智能日常助手是一款专为大学生设计的个人效率与情感陪伴 App，围绕两大场景设计：
+随记是一款专为大学生设计的个人效率与情感陪伴 App，围绕两大场景设计：
 
 | 场景 | 解决的问题 |
 |------|-----------|
@@ -72,7 +72,7 @@
 ### 克隆项目
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/cheng-gui-lin/smart_assistant_app.git
 cd FlutterApplication/flutter_harmonyos
 ```
 
