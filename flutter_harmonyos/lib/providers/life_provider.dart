@@ -190,6 +190,11 @@ class LifeProvider extends ChangeNotifier {
     final response = await _deepSeek.chatConversation(history);
 
     _chatSession.messages.add(ChatMessage(role: 'ai', content: response));
+    // 限制消息数量不超过 200 条
+    if (_chatSession.messages.length > 200) {
+      _chatSession.messages =
+          _chatSession.messages.sublist(_chatSession.messages.length - 200);
+    }
     _saveChatToHive();
     notifyListeners();
   }

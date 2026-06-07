@@ -1,0 +1,23 @@
+# Flutter/Dart
+.dart_tool/
+.packages
+.pub/
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# macOS
+.DS_Store
+
+# Logs
+*.log
+
+# API Key 配置文件（防止误提交）
+*.env
+
+# HarmonyOS 本地签名配置（含密码，不应提交）
+flutter_harmonyos/ohos/**/build-profile.json5

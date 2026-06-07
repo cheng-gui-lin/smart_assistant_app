@@ -13,6 +13,7 @@ import 'package:flutter_harmonyos/providers/user_provider.dart';
 import 'package:flutter_harmonyos/providers/pomodoro_provider.dart';
 import 'package:flutter_harmonyos/providers/life_provider.dart';
 import 'package:flutter_harmonyos/services/notification_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -36,10 +37,15 @@ void main() async {
 
   await initializeDateFormatting('zh_CN');
 
+  final prefs = await SharedPreferences.getInstance();
+  final initialTheme =
+      (prefs.getBool('theme_mode') ?? false) ? ThemeMode.dark : ThemeMode.light;
+
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => ThemeProvider()),
+        ChangeNotifierProvider(
+            create: (_) => ThemeProvider(initial: initialTheme)),
         ChangeNotifierProvider(create: (_) => TodoProvider()),
         ChangeNotifierProvider(create: (_) => GoalProvider()),
         ChangeNotifierProvider(create: (_) => UserProvider()),

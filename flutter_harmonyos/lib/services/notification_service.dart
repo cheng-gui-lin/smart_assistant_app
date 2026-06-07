@@ -1,5 +1,7 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:timezone/timezone.dart' as tz;
+import 'package:timezone/data/latest.dart' as tz_data;
 
 class NotificationService {
   final FlutterLocalNotificationsPlugin _plugin =
@@ -12,6 +14,7 @@ class NotificationService {
   NotificationService._internal();
 
   Future<void> init() async {
+    tz_data.initializeTimeZones();
     const androidSettings =
         AndroidInitializationSettings('@mipmap/ic_launcher');
     const iosSettings = DarwinInitializationSettings(
@@ -145,21 +148,49 @@ class NotificationService {
     );
   }
 
-  Future<void> showAiCommentReady() async {
-    await _plugin.show(
-      1007,
-      '🤖 AI 评论就绪',
-      'AI 已为你的动态生成了评论，快来看看吧～',
+  /// 取消所有定时通知
+  Future<void> cancelScheduledNotifications() async {
+    await _plugin.cancel(1004);
+  }
+
+  /// 注册每日 18:00 的每日小结定时通知
+  Future<void> scheduleDailySummary(
+      int completed, int total, int minutes, String summary) async {
+    if (!await _isEnabled('day_summary')) return;
+
+    final now = DateTime.now();
+    final scheduleDate = DateTime(now.year, now.month, now.day, 18, 0);
+    // 如果已经过了今天 18:00，且今日未推送过，立即推送
+    if (now.isAfter(scheduleDate)) {
+      final prefs = await SharedPreferences.getInstance();
+      final lastDate = prefs.getString('last_daily_summary_date') ?? '';
+      final todayKey = now.toIso8601String().substring(0, 10);
+      if (!lastDate.startsWith(todayKey)) {
+        await showDailySummary(completed, total, minutes, summary);
+        await prefs.setString('last_daily_summary_date', now.toIso8601String());
+      }
+      return;
+    }
+
+    await _plugin.zonedSchedule(
+      1004,
+      '🌟 每日小结',
+      '今日完成了 $completed/$total 个待办，专注了 $minutes 分钟。$summary',
+      tz.TZDateTime.from(scheduleDate, tz.local),
       const NotificationDetails(
         android: AndroidNotificationDetails(
-          'ai_comment',
-          'AI评论',
-          channelDescription: 'AI评论生成完成通知',
+          'day_summary',
+          '每日小结',
+          channelDescription: '每日学习小结通知',
           importance: Importance.defaultImportance,
           priority: Priority.defaultPriority,
         ),
         iOS: DarwinNotificationDetails(),
       ),
+      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+      uiLocalNotificationDateInterpretation:
+          UILocalNotificationDateInterpretation.absoluteTime,
+      matchDateTimeComponents: DateTimeComponents.time,
     );
   }
 }

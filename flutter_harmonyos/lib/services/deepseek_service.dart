@@ -2,7 +2,8 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class DeepSeekService {
-  static const String _apiKey = 'sk-a06a73302fc640129cd5688436f5a0c1';
+  static String get _apiKey =>
+      const String.fromEnvironment('DEEPSEEK_API_KEY', defaultValue: '');
   static const String _baseUrl = 'https://api.deepseek.com/v1/chat/completions';
 
   static const String systemIdentity = '你的名字叫晴天，是一名温暖治愈、乐观开朗的生活陪伴助手。'

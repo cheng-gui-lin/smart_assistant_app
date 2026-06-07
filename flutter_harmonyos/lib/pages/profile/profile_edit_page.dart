@@ -76,14 +76,26 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
     if (_nicknameController.text.trim().isNotEmpty) {
       userProvider.updateNickname(_nicknameController.text.trim());
     }
-    if (_accountController.text.trim().isNotEmpty) {
-      userProvider.updateAccount(_accountController.text.trim());
+    final account = _accountController.text.trim();
+    if (account.isNotEmpty) {
+      // 基础邮箱格式校验
+      if (!_isValidEmail(account)) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('请输入有效的邮箱地址')),
+        );
+        return;
+      }
+      userProvider.updateAccount(account);
     }
     userProvider.updateBio(_bioController.text.trim());
     if (_avatarBytes != null) {
       userProvider.updateAvatar(base64Encode(_avatarBytes!));
     }
     Navigator.pop(context);
+  }
+
+  bool _isValidEmail(String email) {
+    return RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(email);
   }
 
   @override

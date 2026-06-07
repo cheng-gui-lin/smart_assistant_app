@@ -33,9 +33,8 @@ class _GoalFormPageState extends State<GoalFormPage> {
     final goal = Goal(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       title: title,
+      description: _descController.text.trim(),
       deadline: _deadline ?? DateTime.now().add(const Duration(days: 30)),
-      remainingDays:
-          _deadline != null ? _deadline!.difference(DateTime.now()).inDays : 30,
     );
     context.read<GoalProvider>().addGoal(goal);
     Navigator.pop(context);

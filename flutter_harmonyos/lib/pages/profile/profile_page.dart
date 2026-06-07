@@ -273,7 +273,7 @@ class ProfilePage extends StatelessWidget {
                         context: context,
                         applicationName: '随记',
                         applicationVersion: '1.0.0',
-                        applicationLegalese: '智能日常助手APP',
+                        applicationLegalese: '随记APP',
                       );
                     },
                   ),

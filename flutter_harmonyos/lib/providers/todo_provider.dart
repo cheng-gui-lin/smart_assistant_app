@@ -67,6 +67,15 @@ class TodoProvider extends ChangeNotifier {
     }
   }
 
+  void markTodoDone(String id) {
+    final index = _todos.indexWhere((t) => t.id == id);
+    if (index != -1 && !_todos[index].done) {
+      _todos[index].done = true;
+      _saveToHive();
+      notifyListeners();
+    }
+  }
+
   void addTodo(Todo todo) {
     _todos.add(todo);
     _saveToHive();

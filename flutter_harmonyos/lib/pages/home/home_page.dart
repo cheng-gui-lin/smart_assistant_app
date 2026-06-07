@@ -1,9 +1,12 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_harmonyos/routes/app_routes.dart';
 import 'package:flutter_harmonyos/providers/todo_provider.dart';
 import 'package:flutter_harmonyos/providers/goal_provider.dart';
+import 'package:flutter_harmonyos/providers/pomodoro_provider.dart';
 import 'package:flutter_harmonyos/providers/user_provider.dart';
 import 'package:flutter_harmonyos/services/notification_service.dart';
 
@@ -20,14 +23,49 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (!mounted) return;
+      if (kIsWeb) return;
+
+      // 待办提醒
       final todoProvider = context.read<TodoProvider>();
       final todayTodos = todoProvider.getTodosForDate(DateTime.now());
       final undone = todayTodos.where((t) => !t.done).length;
       if (undone > 0) {
         NotificationService().showTodoReminder(undone);
       }
+
+      // 目标截止提醒
+      final goalProvider = context.read<GoalProvider>();
+      for (final goal in goalProvider.goals) {
+        if (goal.remainingDays <= 3 && goal.remainingDays > 0) {
+          NotificationService()
+              .showGoalReminder(goal.title, (goal.progress * 100).toInt());
+        }
+        for (final subGoal in goal.subGoals) {
+          if (!subGoal.isCompleted) {
+            final daysLeft = subGoal.deadline.difference(DateTime.now()).inDays;
+            if (daysLeft <= 3 && daysLeft >= 0) {
+              NotificationService().showSubGoalReminder(subGoal.title);
+            }
+          }
+        }
+      }
+
+      // 每日小结：取消旧定时通知，注册今日 18:00 的新通知
+      final completed = todayTodos.where((t) => t.done).length;
+      final total = todayTodos.length;
+      final pomodoroProvider = context.read<PomodoroProvider>();
+      final minutes = pomodoroProvider.todayMinutes;
+      final doneStr = total > 0 ? '完成了 $completed/$total 个待办' : '暂无待办';
+      await NotificationService().cancelScheduledNotifications();
+      await NotificationService()
+          .scheduleDailySummary(completed, total, minutes, doneStr);
+
+      // 标记今日已推送每日小结（防重复）
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(
+          'last_daily_summary_date', DateTime.now().toIso8601String());
     });
   }
 
@@ -69,6 +107,30 @@ class _HomePageState extends State<HomePage> {
               }
             },
             child: const Text('开始'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _confirmDeleteTodo(TodoProvider provider, String id, String title) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('删除待办'),
+        content: Text('确定要删除「$title」吗？'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('取消'),
+          ),
+          TextButton(
+            onPressed: () {
+              provider.deleteTodo(id);
+              Navigator.pop(ctx);
+            },
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('删除'),
           ),
         ],
       ),
@@ -204,19 +266,19 @@ class _HomePageState extends State<HomePage> {
                                     children: [
                                       GestureDetector(
                                         onTap: () {
-                                          todoProvider.deleteTodo(todo.id);
+                                          _confirmDeleteTodo(todoProvider,
+                                              todo.id, todo.title);
                                         },
                                         child: Container(
                                           width: 20,
                                           height: 20,
                                           decoration: BoxDecoration(
-                                            color: _priorityColor(
-                                                todo.priority),
+                                            color:
+                                                _priorityColor(todo.priority),
                                             shape: BoxShape.circle,
                                           ),
                                           child: const Icon(Icons.remove,
-                                              size: 14,
-                                              color: Colors.white),
+                                              size: 14, color: Colors.white),
                                         ),
                                       ),
                                       const SizedBox(width: 12),

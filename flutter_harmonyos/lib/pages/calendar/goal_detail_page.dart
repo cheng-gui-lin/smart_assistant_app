@@ -15,13 +15,11 @@ class GoalDetailPage extends StatefulWidget {
 class _GoalDetailPageState extends State<GoalDetailPage> {
   final _subGoalController = TextEditingController();
   DateTime? _subGoalDeadline;
-  late DateTime _createdDate;
   bool _showAddForm = false;
 
   @override
   void initState() {
     super.initState();
-    _createdDate = DateTime.now();
   }
 
   @override
@@ -363,7 +361,7 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '创建于 ${DateFormat('yyyy/MM/dd').format(_createdDate)}',
+                      '创建于 ${DateFormat('yyyy/MM/dd').format(goal.createdAt)}',
                       style: theme.textTheme.bodySmall
                           ?.copyWith(color: Colors.grey),
                     ),

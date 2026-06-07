@@ -54,6 +54,30 @@ class _CalendarPageState extends State<CalendarPage> {
     return a.year == b.year && a.month == b.month && a.day == b.day;
   }
 
+  void _confirmDeleteTodo(TodoProvider provider, String id, String title) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('删除待办'),
+        content: Text('确定要删除「$title」吗？'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('取消'),
+          ),
+          TextButton(
+            onPressed: () {
+              provider.deleteTodo(id);
+              Navigator.pop(ctx);
+            },
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('删除'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -201,8 +225,7 @@ class _CalendarPageState extends State<CalendarPage> {
               const SizedBox(height: 16),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: _buildDayDetail(
-                    theme, todoProvider, pomodoroProvider),
+                child: _buildDayDetail(theme, todoProvider, pomodoroProvider),
               ),
             ] else ...[
               SizedBox(
@@ -311,7 +334,8 @@ class _CalendarPageState extends State<CalendarPage> {
                         children: [
                           GestureDetector(
                             onTap: () {
-                              todoProvider.deleteTodo(todo.id);
+                              _confirmDeleteTodo(
+                                  todoProvider, todo.id, todo.title);
                             },
                             child: Container(
                               width: 20,

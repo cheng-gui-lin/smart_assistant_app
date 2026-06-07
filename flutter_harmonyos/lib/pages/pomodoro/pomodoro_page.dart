@@ -67,6 +67,13 @@ class _PomodoroPageState extends State<PomodoroPage> {
     _stopTimer();
     _recordSession();
     NotificationService().showPomodoroComplete(_totalSeconds ~/ 60);
+
+    // 连续专注鼓励（连续 >= 3 天时触发）
+    final streak = context.read<PomodoroProvider>().streakDays;
+    if (streak >= 3) {
+      NotificationService().showStreakEncouragement(streak);
+    }
+
     _showCompleteDialog();
     setState(() => _remainingSeconds = _totalSeconds);
   }
@@ -85,7 +92,7 @@ class _PomodoroPageState extends State<PomodoroPage> {
     );
     pomodoroProvider.addRecord(record);
     if (_selectedTodoId != null) {
-      context.read<TodoProvider>().toggleTodo(_selectedTodoId!);
+      context.read<TodoProvider>().markTodoDone(_selectedTodoId!);
     }
   }
 

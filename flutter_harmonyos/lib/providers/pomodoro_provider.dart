@@ -40,7 +40,6 @@ class PomodoroProvider extends ChangeNotifier {
         durationMinutes: 25,
         todoId: '2',
         todoTitle: '写英语作文',
-        completedAt: DateTime(now.year, now.month, now.day, 10, 0),
       ),
       PomodoroRecord(
         id: 'pr2',
@@ -48,13 +47,11 @@ class PomodoroProvider extends ChangeNotifier {
         durationMinutes: 25,
         todoId: '2',
         todoTitle: '写英语作文',
-        completedAt: DateTime(now.year, now.month, now.day, 14, 30),
       ),
       PomodoroRecord(
         id: 'pr3',
         date: now.subtract(const Duration(days: 1)),
         durationMinutes: 30,
-        completedAt: DateTime(now.year, now.month, now.day - 1, 15, 0),
       ),
       PomodoroRecord(
         id: 'pr4',
@@ -62,7 +59,6 @@ class PomodoroProvider extends ChangeNotifier {
         durationMinutes: 25,
         todoId: '1',
         todoTitle: '复习高数第三章',
-        completedAt: DateTime(now.year, now.month, now.day - 2, 9, 0),
       ),
       PomodoroRecord(
         id: 'pr5',
@@ -70,13 +66,11 @@ class PomodoroProvider extends ChangeNotifier {
         durationMinutes: 25,
         todoId: '1',
         todoTitle: '复习高数第三章',
-        completedAt: DateTime(now.year, now.month, now.day - 2, 11, 0),
       ),
       PomodoroRecord(
         id: 'pr6',
         date: now.subtract(const Duration(days: 2)),
         durationMinutes: 25,
-        completedAt: DateTime(now.year, now.month, now.day - 2, 15, 0),
       ),
     ];
   }
@@ -96,8 +90,7 @@ class PomodoroProvider extends ChangeNotifier {
   }
 
   int getTotalMinutesForDate(DateTime date) {
-    return getRecordsForDate(date)
-        .fold(0, (sum, r) => sum + r.durationMinutes);
+    return getRecordsForDate(date).fold(0, (sum, r) => sum + r.durationMinutes);
   }
 
   int get totalRecords {
@@ -137,5 +130,21 @@ class PomodoroProvider extends ChangeNotifier {
       result[key] = getTotalMinutesForDate(date);
     }
     return result;
+  }
+
+  int get streakDays {
+    final now = DateTime.now();
+    // 今天必须有记录，否则连续天数为 0
+    if (getRecordsForDate(now).isEmpty) return 0;
+    int streak = 0;
+    for (int i = 0; i < 365; i++) {
+      final date = now.subtract(Duration(days: i));
+      if (getRecordsForDate(date).isNotEmpty) {
+        streak++;
+      } else {
+        break;
+      }
+    }
+    return streak;
   }
 }

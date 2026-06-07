@@ -35,35 +35,41 @@ class Goal {
   String title;
   String description;
   double progress;
-  int remainingDays;
   DateTime deadline;
   String iconName;
   String status;
   List<SubGoal> subGoals;
+  final DateTime createdAt;
+
+  int get remainingDays {
+    final days = deadline.difference(DateTime.now()).inDays;
+    return days < 0 ? 0 : days;
+  }
 
   Goal({
     required this.id,
     required this.title,
     this.description = '',
     this.progress = 0.0,
-    this.remainingDays = 30,
     DateTime? deadline,
     this.iconName = 'school',
     this.status = '进行中',
     List<SubGoal>? subGoals,
+    DateTime? createdAt,
   })  : deadline = deadline ?? DateTime.now().add(const Duration(days: 30)),
-        subGoals = subGoals ?? [];
+        subGoals = subGoals ?? [],
+        createdAt = createdAt ?? DateTime.now();
 
   Map<String, dynamic> toJson() => {
         'id': id,
         'title': title,
         'description': description,
         'progress': progress,
-        'remainingDays': remainingDays,
         'deadline': deadline.toIso8601String(),
         'iconName': iconName,
         'status': status,
         'subGoals': subGoals.map((s) => s.toJson()).toList(),
+        'createdAt': createdAt.toIso8601String(),
       };
 
   factory Goal.fromJson(Map<String, dynamic> json) => Goal(
@@ -71,7 +77,6 @@ class Goal {
         title: json['title'] as String,
         description: json['description'] as String? ?? '',
         progress: (json['progress'] as num?)?.toDouble() ?? 0.0,
-        remainingDays: json['remainingDays'] as int? ?? 30,
         deadline: DateTime.parse(json['deadline'] as String),
         iconName: json['iconName'] as String? ?? 'school',
         status: json['status'] as String? ?? '进行中',
@@ -79,5 +84,8 @@ class Goal {
                 ?.map((s) => SubGoal.fromJson(s as Map<String, dynamic>))
                 .toList() ??
             [],
+        createdAt: json['createdAt'] != null
+            ? DateTime.parse(json['createdAt'] as String)
+            : null,
       );
 }
